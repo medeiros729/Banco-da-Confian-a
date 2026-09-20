@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco da Honestidade</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#071a33;color:#fff}
+.container{max-width:1000px;margin:auto;padding:28px 20px 50px}
+.header{text-align:center;margin-bottom:22px}
+h1{margin:0 0 8px;font-size:38px}
+.subtitle{color:#c9d6e6;font-size:17px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.stat{background:#102d50;border:1px solid #315276;border-radius:14px;padding:18px;text-align:center}
+.stat .label{font-size:14px;color:#b9c9db}
+.stat .value{font-size:30px;font-weight:bold;margin-top:6px}
+.bar{height:10px;background:#213d5c;border-radius:20px;overflow:hidden;margin-top:10px}
+.fill{height:100%;width:50%;background:#69c18b;transition:width .3s}
+.round,.final{background:#f7f9fc;color:#132238;border-radius:18px;padding:28px;box-shadow:0 12px 35px rgba(0,0,0,.22)}
+.round-number{color:#507096;font-weight:bold;font-size:14px;text-transform:uppercase;letter-spacing:1px}
+h2{margin:8px 0 12px;font-size:28px}
+.scenario{font-size:18px;line-height:1.55;margin-bottom:20px}
+.tag{display:inline-block;padding:6px 10px;border-radius:20px;background:#e6edf5;color:#315276;font-size:12px;font-weight:bold;margin-bottom:12px}
+.options{display:grid;gap:12px}
+button.option{border:2px solid #d6e0eb;background:white;color:#132238;border-radius:12px;padding:16px;text-align:left;cursor:pointer;font-size:16px;line-height:1.4;transition:.2s}
+button.option:hover{border-color:#54789e;transform:translateY(-1px)}
+button.option:disabled{cursor:default;opacity:.75}
+.result{margin-top:18px;padding:18px;border-radius:12px;background:#eaf4ee;border-left:5px solid #69c18b;display:none;line-height:1.5}
+.result strong{display:block;margin-bottom:7px}
+.next,.restart{margin-top:18px;width:100%;border:0;background:#173d68;color:white;padding:15px;border-radius:11px;font-size:16px;cursor:pointer;display:none}
+.next:hover,.restart:hover{background:#24527f}
+.final{display:none}
+.final h2{text-align:center}
+.final-score{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:22px 0}
+.score-box{background:#e9eff6;padding:20px;text-align:center;border-radius:12px}
+.score-box .big{font-size:30px;font-weight:bold;margin-top:5px}
+.message{background:#edf5ef;border-radius:12px;padding:18px;line-height:1.5;margin-bottom:22px}
+.reflection{background:#f2f4f7;padding:18px;border-radius:12px;line-height:1.6}
+.note{text-align:center;color:#9eb2c9;font-size:13px;margin-top:16px}
+@media(max-width:650px){.stats,.final-score{grid-template-columns:1fr}h1{font-size:30px}.round,.final{padding:20px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🤝 Banco da Honestidade</h1>
+    <div class="subtitle">Cada decisão constrói um tipo de patrimônio.</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="label">💰 DINHEIRO</div>
+      <div class="value" id="money">R$ 1.000</div>
+    </div>
+    <div class="stat">
+      <div class="label">🤝 HONESTIDADE</div>
+      <div class="value" id="honesty">50/100</div>
+      <div class="bar"><div class="fill" id="honestyBar"></div></div>
+    </div>
+  </div>
+
+  <div class="round" id="game"></div>
+
+  <div class="final" id="final">
+    <h2>🏁 Fim do jogo</h2>
+    <div class="final-score">
+      <div class="score-box"><div>💰 Dinheiro</div><div class="big" id="finalMoney"></div></div>
+      <div class="score-box"><div>🤝 Honestidade</div><div class="big" id="finalHonesty"></div></div>
+    </div>
+    <div class="message" id="finalMessage"></div>
+    <div class="reflection">
+      <strong>💭 Para conversar:</strong>
+      <ol>
+        <li>Em qual situação foi mais difícil ser honesto?</li>
+        <li>Alguma escolha honesta fez você perder dinheiro?</li>
+        <li>Alguma escolha desonesta parecia vantajosa no curto prazo?</li>
+        <li>Em quais situações você percebeu que honestidade não tinha relação direta com dinheiro?</li>
+        <li>Que tipo de patrimônio você quer construir?</li>
+      </ol>
+      <strong>Mensagem:</strong> dinheiro é patrimônio. Honestidade, credibilidade e confiança também são patrimônio.
+    </div>
+    <button class="restart" style="display:block" onclick="restart()">🔄 Jogar novamente</button>
+  </div>
+
+  <div class="note">Honestidade começa em 50/100. Algumas decisões afetam dinheiro; outras afetam apenas seu patrimônio de caráter.</div>
+</div>
+
+<script>
+const rounds = [
+{title:"O Pix errado",type:"💰 DINHEIRO",text:"Um amigo precisava devolver R$200 para você, mas por engano fez um Pix de R$500. Você percebe o erro antes que ele perceba.",options:[["Devolver os R$300 que foram enviados a mais.",-300,8,"Você abriu mão de dinheiro que não era seu, corrigindo o erro de forma transparente."],["Ficar com os R$300 e não comentar nada.",300,-12,"Você ganhou dinheiro no curto prazo ao ficar com um valor que sabia não ser seu."],["Avisar o amigo e conversar sobre a melhor forma de corrigir o erro.",-300,4,"Você perde R$300, mas escolhe ser transparente e corrigir a situação."]]},{title:"A conta do restaurante",type:"🤝 AMIGOS",text:"Você está em um restaurante com três amigos. Na conta, o garçom esqueceu de cobrar uma sobremesa de R$60 que vocês consumiram.",options:[["Avisar o garçom e pagar a sobremesa.",-60,8,"Você paga os R$60 que faltaram, mesmo podendo simplesmente ir embora sem ninguém perceber."],["Ficar quieto, já que o restaurante cometeu o erro.",60,-10,"Você economiza R$60 ao se beneficiar de um erro que percebeu."],["Avisar seus amigos e deixar o grupo decidir como proceder.",0,3,"Você coloca o erro sobre a mesa e deixa a decisão ser tomada pelo grupo."]]},{title:"O amigo que está devendo",type:"🤝 AMIGOS",text:"Um amigo está devendo R$400 a você. Ele pede mais tempo porque está apertado e promete pagar no próximo mês.",options:[["Aceitar o prazo e combinar uma data clara para o pagamento.",-400,7,"Você decide esperar pelo pagamento e estabelece claramente quando espera receber."],["Dizer que está tudo bem, mas depois cobrar de forma agressiva para pressioná-lo.",400,-5,"Você aparenta aceitar a situação, mas depois age de forma diferente para obter vantagem."],["Explicar que você também precisa do dinheiro e negociar uma solução.",100,6,"Na negociação, seu amigo consegue pagar R$100 agora e vocês combinam o restante para depois."]]},{title:"O troco errado",type:"💰 MERCADO",text:"No mercado, sua compra deu R$87. Você entrega R$200 e recebe R$113 de troco. O correto seria receber R$13.",options:[["Devolver os R$100 recebidos a mais.",0,10,"Você devolve o dinheiro que recebeu por engano."],["Guardar o dinheiro e ir embora.",100,-15,"Você fica com R$100 que sabe que recebeu por engano."],["Chamar o caixa e pedir que confira o troco.",-100,7,"Ao conferir o troco, você devolve os R$100 recebidos a mais."]]},{title:"A promoção da empresa",type:"🏢 EMPRESA",text:"Um colega apresenta para a liderança um trabalho que vocês fizeram juntos, mas fala como se praticamente tudo tivesse sido feito por ele.",options:[["Conversar diretamente com ele e explicar como você participou.",0,8,"Você busca reconhecimento de maneira direta e transparente."],["Ficar quieto e depois tentar prejudicá-lo pelas costas.",0,-12,"Você escolhe uma atitude desleal em resposta a outra situação injusta."],["Apresentar os fatos e registros do trabalho à liderança.",0,4,"Você apresenta os fatos para esclarecer sua participação, sem inventar ou distorcer informações."]]},{title:"O desconto por fora",type:"💰 MERCADO",text:"Um prestador oferece um serviço por R$2.000 com nota fiscal, mas diz que pode fazer por R$1.600 se você pagar por fora, sem recibo.",options:[["Pagar os R$2.000 oficialmente e pedir o comprovante.",-400,8,"Você paga mais, mas mantém uma transação formal e transparente."],["Aceitar os R$1.600 sem recibo.",0,-12,"Você economiza, mas aceita uma negociação sem registro ou comprovante."],["Perguntar se ele consegue oferecer um desconto oficial com recibo.",-200,6,"Você tenta reduzir o preço sem abrir mão da transparência."]]},{title:"A compra duplicada",type:"💰 DINHEIRO",text:"Você comprou dois produtos pela internet, mas a loja enviou três. O produto extra vale R$350 e você percebe o erro.",options:[["Avisar a loja e devolver o produto extra.",-350,10,"Você devolve o produto que recebeu por engano."],["Ficar com o produto, porque a loja errou.",350,-14,"Você transforma um erro da loja em benefício próprio."],["Avisar a loja e perguntar se ela prefere que você devolva ou pague pelo produto.",0,7,"Você informa o erro e deixa a loja decidir como deseja resolver a situação."]]},{title:"O orçamento da empresa",type:"🏢 EMPRESA",text:"Você descobre que um fornecedor cobra R$1.500 por um serviço que poderia ser contratado por R$1.000. Seu chefe ainda não sabe dessa diferença.",options:[["Contar ao chefe e apresentar as duas opções.",0,8,"Você compartilha a informação para que a decisão seja tomada com transparência."],["Fazer a empresa pagar R$1.500 e tentar ficar com a diferença.",500,-20,"Você obtém R$500 escondendo uma informação importante da empresa."],["Negociar com o fornecedor um preço menor para a empresa.",200,6,"Você negocia uma condição melhor e busca uma solução que beneficie a empresa."]]},{title:"A venda para um amigo",type:"🤝 AMIGOS",text:"Você está vendendo um equipamento usado por R$900. Você sabe que ele apresenta um defeito ocasional que nem sempre aparece nos testes.",options:[["Contar sobre o defeito e reduzir o preço para R$700.",-200,10,"Você reduz o preço para que seu amigo saiba exatamente o que está comprando."],["Não mencionar o defeito e cobrar os R$900.",0,-16,"Você esconde uma informação relevante para aumentar a chance de vender pelo preço cheio."],["Contar sobre o defeito e oferecer ao amigo a possibilidade de testar antes de decidir.",0,8,"Você revela o problema e permite que seu amigo tome uma decisão consciente."]]},{title:"A última decisão no trabalho",type:"🏢 EMPRESA",text:"Sua empresa está perto de bater uma meta. Você poderia registrar uma venda antecipadamente, antes da etapa prevista no procedimento interno.",options:[["Seguir o procedimento e registrar a venda no momento correto.",0,10,"Você mantém o procedimento mesmo diante da pressão para bater a meta."],["Registrar antecipadamente para ajudar a empresa a bater a meta.",300,-18,"Você consegue uma vantagem imediata, mas conscientemente contorna o procedimento."],["Perguntar ao responsável qual é o procedimento correto antes de registrar.",0,7,"Você procura esclarecer a regra antes de tomar a decisão."]]}
+];
+let current=0,money=1000,honesty=50;
+function moneyFormat(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+function updateStats(){document.getElementById("money").textContent=moneyFormat(money);document.getElementById("honesty").textContent=honesty+"/100";document.getElementById("honestyBar").style.width=Math.max(0,Math.min(100,honesty))+"%"}
+function renderRound(){const r=rounds[current];document.getElementById("game").innerHTML=`<div class="round-number">Rodada ${current+1} de ${rounds.length}</div><span class="tag">${r.type}</span><h2>${r.title}</h2><div class="scenario">${r.text}</div><div class="options">${r.options.map((o,i)=>`<button class="option" onclick="choose(${i})"><strong>${String.fromCharCode(65+i)}.</strong> ${o[0]}</button>`).join("")}</div><div class="result" id="result"></div><button class="next" id="next" onclick="nextRound()">${current===rounds.length-1?"Ver resultado final →":"Próxima situação →"}</button>`}
+function choose(index){const choice=rounds[current].options[index];money+=choice[1];honesty=Math.max(0,Math.min(100,honesty+choice[2]));updateStats();document.querySelectorAll(".option").forEach(b=>b.disabled=true);const result=document.getElementById("result"),moneyChange=choice[1]===0?"":`<br>💰 Dinheiro: ${choice[1]>0?"+":""}${moneyFormat(choice[1])}`,honestyChange=`<br>🤝 Honestidade: ${choice[2]>0?"+":""}${choice[2]} pontos`;result.innerHTML=`<strong>Resultado da escolha</strong>${choice[3]}${moneyChange}${honestyChange}`;result.style.display="block";document.getElementById("next").style.display="block"}
+function nextRound(){if(current<rounds.length-1){current++;renderRound();window.scrollTo({top:0,behavior:"smooth"})}else showFinal()}
+function showFinal(){document.getElementById("game").style.display="none";document.querySelector(".note").style.display="none";document.getElementById("final").style.display="block";document.getElementById("finalMoney").textContent=moneyFormat(money);document.getElementById("finalHonesty").textContent=honesty+"/100";let message;if(money>=1000&&honesty>=60)message="<strong>💰 + 🤝 Dinheiro e honestidade</strong>Você terminou com pelo menos o patrimônio financeiro inicial e aumentou sua pontuação de honestidade.";else if(money>=1000&&honesty<60)message="<strong>💰 Muito dinheiro, menos honestidade</strong>Seu patrimônio financeiro terminou alto, mas algumas escolhas reduziram sua pontuação de honestidade.";else if(money<1000&&honesty>=60)message="<strong>🤝 Mais honestidade, menos dinheiro</strong>Algumas escolhas custaram dinheiro, mas sua pontuação de honestidade aumentou.";else message="<strong>⚖️ Menos dinheiro e menos honestidade</strong>Suas escolhas produziram perdas financeiras e também reduziram sua pontuação de honestidade.";document.getElementById("finalMessage").innerHTML=message}
+function restart(){current=0;money=1000;honesty=50;document.getElementById("game").style.display="block";document.querySelector(".note").style.display="block";document.getElementById("final").style.display="none";updateStats();renderRound();window.scrollTo({top:0,behavior:"smooth"})}
+updateStats();renderRound();
+</script>
+</body>
+</html>
